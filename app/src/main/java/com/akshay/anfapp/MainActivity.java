@@ -3,6 +3,7 @@ package com.akshay.anfapp;
 import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -17,44 +18,34 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.MediaType;
 
 public class MainActivity extends AppCompatActivity {
 
     private String BASE_URL = "https://www.abercrombie.com/anf/nativeapp/qa/codetest/codeTest_exploreData.json";
 
-    public static final MediaType JSON
-            = MediaType.parse("application/json; charset=utf-8");
     private List<AFResponseBean> responseBeanList;
-    private RecyclerView rv;
+    private RecyclerView recyclerView;
+    RecyclerAdapter adapter;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.recyclerview_activity);
 
-        rv = (RecyclerView) findViewById(R.id.rv);
-//        LinearLayoutManager llm = new LinearLayoutManager(this);
-//        rv.setLayoutManager(llm);
-//        rv.setHasFixedSize(true);
+        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
 
-        final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        rv.setLayoutManager(layoutManager);
+        responseBeanList = new ArrayList<>();
 
-        new GetMethodDemo().execute(BASE_URL);
-        initializeAdapter();
+        new GetPromotionsAsyncTask().execute(BASE_URL);
 
     }
 
-    private void initializeAdapter() {
-        RecyclerAdapter adapter = new RecyclerAdapter(responseBeanList);
-        rv.setAdapter(adapter);
-    }
 
-    public class GetMethodDemo extends AsyncTask<String, Void, String> {
+    public class GetPromotionsAsyncTask extends AsyncTask<String, Void, String> {
         String jsonResponse;
 
         @Override
@@ -87,13 +78,18 @@ public class MainActivity extends AppCompatActivity {
             super.onPostExecute(s);
 
             Log.e("Json Response", "" + jsonResponse);
-            Gson gson = new Gson();
+            Gson gson = new Gson(); //GSON for Serializing and De-serializing
 
-            List<AFResponseBean> list = gson.fromJson(jsonResponse, new TypeToken<List<AFResponseBean>>() {
+            responseBeanList = gson.fromJson(jsonResponse, new TypeToken<List<AFResponseBean>>() {
             }.getType());
 
+            adapter = new RecyclerAdapter(MainActivity.this, responseBeanList);
 
-            Log.d("akshayakshay", list.get(0).getContent().get(0).getTitle());
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
+            recyclerView.setLayoutManager(linearLayoutManager);
+
+            recyclerView.setItemAnimator(new DefaultItemAnimator());
+            recyclerView.setAdapter(adapter);
 
 
         }

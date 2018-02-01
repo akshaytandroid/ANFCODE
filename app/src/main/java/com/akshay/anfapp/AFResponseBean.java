@@ -80,5 +80,25 @@ public class AFResponseBean {
         public void setTitle(String title) {
             this.title = title;
         }
+
+        @Override
+        public String toString() {
+            return "ContentBean{" +
+                    "target='" + target + '\'' +
+                    ", title='" + title + '\'' +
+                    '}';
+        }
+    }
+
+    @Override
+    public String toString() {
+        return "AFResponseBean{" +
+                "title='" + title + '\'' +
+                ", backgroundImage='" + backgroundImage + '\'' +
+                ", promoMessage='" + promoMessage + '\'' +
+                ", topDescription='" + topDescription + '\'' +
+                ", bottomDescription='" + bottomDescription + '\'' +
+                ", content=" + content +
+                '}';
     }
 }
